@@ -26,7 +26,7 @@ import numpy as np
 def get_args():
     parser = argparse.ArgumentParser(
             description="""analyze parameters for amniotes""")
-    parser.add_argument('--file',
+    parser.add_argument('--in_file',
                         type=str,
                         required=True,
                         help="text file to use for analysis",
@@ -35,6 +35,11 @@ def get_args():
                         type=str,
                         required=True,
                         help="enter list of parameters separated by commas",
+                        )
+    parser.add_argument('--out_file',
+                        type=str,
+                        required=True,
+                        help="enter an output .csv file name",
                         )
     return parser.parse_args()
 
@@ -49,13 +54,13 @@ def amniote(args):
             '95CI(parameter)', 'min(parameter)', 'max(parameter)',
             'median(parameter)']
     # import file
-    df = pd.read_csv(args.file)
+    df = pd.read_csv(args.in_file)
     df = df.replace(-999, np.nan)
     # sets of classes and orders
     classes = set(df['class'])
     order = set(df['order'])
     # pdb.set_trace()
-    with open('results.csv', 'w') as outfile:
+    with open(args.out_file, 'w') as outfile:
         writer = csv.writer(outfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(pars)
         for tax in classes:
@@ -72,15 +77,24 @@ def amniote(args):
                         # pdb.set_trace()
                         r = list(div[val].describe())
                         info = [tax, taxon, val]
-                        out_list = info + [str(r[1]), str(div[val].std()), str(r[3]),
-                                           str(r[7]), str(r[5])]
+                        # calculate 95% CI
+                        sem = (div[val].std()/np.sqrt(len(div[val])))*2
+                        # pdb.set_trace()
+                        sem_range = '{}-{}'.format((sem+r[1]), (sem-r[1]))
+                        out_list = info + [str(r[1]), str(sem_range),
+                                           str(r[3]), str(r[7]), str(r[5])]
                         # pdb.set_trace()
                         writer.writerow(out_list)
 
 
 def main():
     args = get_args()
-    os.chdir(os.path.dirname(args.file))
+    # rename outfile to .csv if needed
+    if args.out_file[-4:] != '.csv':
+        args.out_file += '.csv'
+    else:
+        pass
+    os.chdir(os.path.dirname(args.in_file))
     args.parameters = args.parameters.split(',')
     # pdb.set_trace()
     amniote(args)
