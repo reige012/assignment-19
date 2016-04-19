@@ -72,7 +72,7 @@ def amniote(args):
                         # pdb.set_trace()
                         r = list(div[val].describe())
                         info = [tax, taxon, val]
-                        out_list = info + [str(r[1]), str((r[2]*2)), str(r[3]),
+                        out_list = info + [str(r[1]), str(div[val].std()), str(r[3]),
                                            str(r[7]), str(r[5])]
                         # pdb.set_trace()
                         writer.writerow(out_list)
