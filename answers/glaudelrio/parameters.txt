@@ -1,0 +1,8 @@
+female_maturity_d
+litter_or_clutch_size_n
+litters_or_clutches_per_y
+adult_body_mass_g
+maximum_longevity_y
+longevity_y
+female_body_mass_g
+male_body_mass_g
